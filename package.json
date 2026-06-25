@@ -1,6 +1,6 @@
 {
   "name": "@faigle/node-red-contrib-_template_",
-  "version": "0.0.4",
+  "version": "0.1.1",
   "description": "Template/Example ddnode for Node-Red",
   "private": false,
   "license": "MIT",
@@ -13,6 +13,6 @@
     "husky": "^9.1.7"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky install"
   }
 }
