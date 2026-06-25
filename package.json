@@ -1,0 +1,12 @@
+{
+  "name": "@faigle/node-red-contrib-_template_",
+  "version": "0.0.2",
+  "description": "Template/Example ddnode for Node-Red",
+  "private": false,
+  "license": "MIT",
+  "node-red": {
+    "nodes": {
+      "_template_": "src/_template_.js"
+    }
+  }
+}
