@@ -1,6 +1,6 @@
 {
   "name": "@faigle/node-red-contrib-_template_",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Template/Example ddnode for Node-Red",
   "private": false,
   "license": "MIT",
@@ -10,6 +10,13 @@
     }
   },
   "devDependencies": {
+    "@eslint/css": "^1.3.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.0.0",
+    "@eslint/markdown": "^8.0.2",
+    "eslint": "^10.5.0",
+    "eslint-plugin-html": "^8.1.4",
+    "globals": "^17.7.0",
     "husky": "^9.1.7",
     "mocha": "^11.7.6",
     "node-red": "^5.0.0",
@@ -17,6 +24,7 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "test": "mocha \"test/**/*_spec.js\""
+    "test": "mocha \"test/**/*_spec.js\"",
+    "lint": "eslint \"**/*.{js,html}\""
   }
 }
