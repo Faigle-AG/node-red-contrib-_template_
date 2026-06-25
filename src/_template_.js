@@ -1,4 +1,4 @@
-module.exports = function(RED) {
+module.exports = function (RED) {
     function ExampleTemplateNode(config) {
         RED.nodes.createNode(this, config);
         this.name = config.name;
@@ -6,12 +6,12 @@ module.exports = function(RED) {
 
         var node = this;
 
-        node.on("input", function(msg, send, done) {
+        node.on('input', function (msg, send, done) {
             if (node.enableLogging) {
-                node.log("Received payload: " + JSON.stringify(msg.payload));
+                node.log('Received payload: ' + JSON.stringify(msg.payload));
             }
 
-            node.status({fill: "blue", shape: "dot", text: "Processed message"});
+            node.status({ fill: 'blue', shape: 'dot', text: 'Processed message' });
 
             send(msg);
 
@@ -23,5 +23,5 @@ module.exports = function(RED) {
         });
     }
 
-    RED.nodes.registerType("_template_", ExampleTemplateNode);
-}
+    RED.nodes.registerType('_template_', ExampleTemplateNode);
+};

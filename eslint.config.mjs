@@ -5,6 +5,7 @@ import markdown from "@eslint/markdown";
 import css from "@eslint/css";
 import { defineConfig } from "eslint/config";
 import html from "eslint-plugin-html";
+import eslintConfigPrettier from "eslint-config-prettier";
 
 
 export default defineConfig([
@@ -17,4 +18,6 @@ export default defineConfig([
   { files: ["**/*.css"], plugins: { css }, language: "css/css", extends: ["css/recommended"] },
   { files: ["**/*.html"], plugins: { html } },
   { files: ["test/**/*.js"], languageOptions: { globals: globals.mocha } },
+
+  eslintConfigPrettier // MUST BE LAST
 ]);
