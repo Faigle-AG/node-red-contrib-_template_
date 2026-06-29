@@ -1,6 +1,6 @@
 {
   "name": "@faigle/node-red-contrib-_template_",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Template/Example node for Node-Red",
   "keywords": [
     "node-red"
@@ -29,7 +29,7 @@
     "prettier": "^3.8.4"
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "npx --yes husky",
     "test": "mocha \"test/**/*_spec.js\"",
     "format": "prettier --write \"**/*.{js,html,md}\"",
     "lint": "eslint \"**/*.{js,html}\""
