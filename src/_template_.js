@@ -1,25 +1,38 @@
 module.exports = function (RED) {
+    const { extendStatus, extendProperties } = require('@faigle/node-red-runtime-utils')(RED);
+
     function ExampleTemplateNode(config) {
         RED.nodes.createNode(this, config);
+
         this.name = config.name;
         this.enableLogging = config.enableLogging;
 
-        var node = this;
+        const node = this;
+
+        extendStatus(node);
+        extendProperties(node);
 
         node.on('input', function (msg, send, done) {
-            if (node.enableLogging) {
-                node.log('Received payload: ' + JSON.stringify(msg.payload));
+            send =
+                send ||
+                function () {
+                    node.send.apply(node, arguments);
+                };
+
+            try {
+                if (node.enableLogging) {
+                    node.log('Received payload: ' + JSON.stringify(msg.payload));
+                }
+
+                node.status.processing('processing message');
+
+                send(msg);
+
+                if (done) done();
+            } catch (err) {
+                if (done) done(err);
+                else node.error(err, msg);
             }
-
-            node.status({ fill: 'blue', shape: 'dot', text: 'Processed message' });
-
-            send(msg);
-
-            if (done) {
-                done();
-            }
-
-            setTimeout(() => node.status({}), 3000);
         });
     }
 
