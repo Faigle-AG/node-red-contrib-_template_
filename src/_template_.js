@@ -1,5 +1,5 @@
 module.exports = function (RED) {
-    const { extendStatus, extendProperties } = require('@faigle/node-red-runtime-utils')(RED);
+    const { extendNode } = require('@faigle/node-red-runtime-utils')(RED);
 
     function ExampleTemplateNode(config) {
         RED.nodes.createNode(this, config);
@@ -8,8 +8,7 @@ module.exports = function (RED) {
 
         var node = this;
 
-        extendStatus(node);
-        extendProperties(node);
+        extendNode(node);
 
         node.on('input', function (msg, send, done) {
             if (node.enableLogging) {

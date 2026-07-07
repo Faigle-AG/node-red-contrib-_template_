@@ -1,6 +1,6 @@
 {
   "name": "@faigle/node-red-contrib-_template_",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Template/Example node for Node-Red",
   "keywords": [
     "node-red"
@@ -29,7 +29,7 @@
     "prettier": "^3.8.4"
   },
   "dependencies": {
-    "@faigle/node-red-runtime-utils": "^0.3.2"
+    "@faigle/node-red-runtime-utils": "^0.3.5"
   },
   "scripts": {
     "prepare": "npx --yes husky",

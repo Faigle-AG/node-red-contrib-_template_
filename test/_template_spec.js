@@ -1,11 +1,17 @@
+const assert = require('assert/strict');
 const helper = require('node-red-node-test-helper');
 const templateNode = require('../src/_template_.js');
 
 helper.init(require.resolve('node-red'));
 
 describe('example-template Node', function () {
-    afterEach(function () {
-        return helper.unload();
+    beforeEach(function (done) {
+        helper.startServer(done);
+    });
+
+    afterEach(function (done) {
+        helper.unload();
+        helper.stopServer(done);
     });
 
     it('should load correctly with the given name', function (done) {
@@ -13,7 +19,7 @@ describe('example-template Node', function () {
 
         helper.load(templateNode, flow, function () {
             const n1 = helper.getNode('n1');
-            n1.should.have.property('name', 'my template');
+            assert.equal(n1.name, 'my template');
             done();
         });
     });
@@ -33,7 +39,7 @@ describe('example-template Node', function () {
             });
 
             n2.on('input', function (msg) {
-                msg.should.have.property('payload', 'hello world');
+                assert.equal(msg.payload, 'hello world');
                 done();
             });
 
