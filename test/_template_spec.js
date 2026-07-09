@@ -24,9 +24,17 @@ describe('example-template Node', function () {
         });
     });
 
-    it('should pass the message payload through unmodified', function (done) {
+    it('should stringify the input, prepend a prefix, and write to the output property', function (done) {
         const flow = [
-            { id: 'n1', type: '_template_', wires: [['n2']] },
+            {
+                id: 'n1',
+                type: '_template_',
+                exampleIn: 'payload',
+                exampleInType: 'msg',
+                exampleOut: 'formattedValue',
+                exampleOutType: 'msg',
+                wires: [['n2']],
+            },
             { id: 'n2', type: 'helper' },
         ];
 
@@ -39,11 +47,51 @@ describe('example-template Node', function () {
             });
 
             n2.on('input', function (msg) {
-                assert.equal(msg.payload, 'hello world');
-                done();
+                try {
+                    assert.equal(msg.payload, 'test value');
+                    assert.equal(msg.formattedValue, 'Input : "test value"');
+                    done();
+                } catch (err) {
+                    done(err);
+                }
             });
 
-            n1.receive({ payload: 'hello world' });
+            n1.receive({ payload: 'test value' });
+        });
+    });
+
+    it('should handle object payloads correctly', function (done) {
+        const flow = [
+            {
+                id: 'n1',
+                type: '_template_',
+                exampleIn: 'payload',
+                exampleInType: 'msg',
+                exampleOut: 'formattedValue',
+                exampleOutType: 'msg',
+                wires: [['n2']],
+            },
+            { id: 'n2', type: 'helper' },
+        ];
+
+        helper.load(templateNode, flow, function () {
+            const n1 = helper.getNode('n1');
+            const n2 = helper.getNode('n2');
+
+            n1.on('call:error', function (call) {
+                done(call.firstArg);
+            });
+
+            n2.on('input', function (msg) {
+                try {
+                    assert.equal(msg.formattedValue, 'Input : {"key":"value"}');
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            });
+
+            n1.receive({ payload: { key: 'value' } });
         });
     });
 });
