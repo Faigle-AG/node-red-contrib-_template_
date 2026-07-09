@@ -1,4 +1,4 @@
-# @faigle/node-red-contrib-_directory_
+# @faigle/node-red-contrib-_template_
 
 This repository is a GitHub template for creating custom Node-RED nodes. It includes a boilerplate node (`_template_`), a testing setup using Mocha, and automated code quality tools.
 
