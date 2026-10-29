@@ -4,155 +4,153 @@
         color: '#a6bbcf',
         defaults: {
             name: { value: '' },
-            enableLogging: { value: true },
-            exampleIn: {
-                value: '',
+            enableLogging: { value: false },
+            source: {
+                value: 'payload',
                 validate: function (v) {
                     if (!v || v.trim() === '') return false;
-                    var builtInValidator = RED.validators.typedInput('exampleInType');
-                    return builtInValidator.call(this, v);
+                    var validator = RED.validators.typedInput('sourceType');
+                    return validator.call(this, v);
                 },
             },
+            sourceType: { value: 'msg' },
+            target: {
+                value: 'payload',
+                validate: function (v) {
+                    if (!v || v.trim() === '') return false;
+                    var validator = RED.validators.typedInput('targetType');
+                    return validator.call(this, v);
+                },
+            },
+            targetType: { value: 'msg' },
+            // Legacy properties for backwards compatibility
+            exampleIn: { value: '' },
             exampleInType: { value: 'str' },
-            exampleOut: {
-                value: '',
-                validate: function (v) {
-                    if (!v || v.trim() === '') return false;
-                    var builtInValidator = RED.validators.typedInput('exampleOutType');
-                    return builtInValidator.call(this, v);
-                },
-            },
+            exampleOut: { value: '' },
             exampleOutType: { value: 'msg' },
-        },
-        oneditprepare: function () {
-            $('#node-input-exampleIn').typedInput({
-                default: 'str',
-                types: ['msg', 'flow', 'global', 'str', 'jsonata', 'env'],
-                typeField: $('#node-input-exampleInType'),
-            });
-            $('#node-input-exampleOut').typedInput({
-                default: 'msg',
-                types: ['msg', 'flow', 'global'],
-                typeField: $('#node-input-exampleOutType'),
-            });
         },
         inputs: 1,
         outputs: 1,
         icon: 'font-awesome/fa-cog',
+        paletteLabel: '_template_',
         label: function () {
-            return this.name || '_template_';
+            return this.name || (this.source ? '_template_ (' + this.source + ')' : '_template_');
+        },
+        oneditprepare: function () {
+            // Migrate legacy properties if present
+            if ((!this.source || this.source === 'payload') && this.exampleIn) {
+                this.source = this.exampleIn;
+                this.sourceType = this.exampleInType || 'str';
+                $('#node-input-source').val(this.source);
+            }
+            if ((!this.target || this.target === 'payload') && this.exampleOut) {
+                this.target = this.exampleOut;
+                this.targetType = this.exampleOutType || 'msg';
+                $('#node-input-target').val(this.target);
+            }
+
+            $('#node-input-source').typedInput({
+                default: 'msg',
+                types: ['msg', 'flow', 'global', 'str', 'num', 'bool', 'json', 'jsonata', 'env'],
+                typeField: $('#node-input-sourceType'),
+            });
+
+            $('#node-input-target').typedInput({
+                default: 'msg',
+                types: ['msg', 'flow', 'global'],
+                typeField: $('#node-input-targetType'),
+            });
+        },
+        oneditsave: function () {
+            // Synchronize legacy fields
+            $('#node-input-exampleIn').val($('#node-input-source').val());
+            $('#node-input-exampleInType').val($('#node-input-sourceType').val());
+            $('#node-input-exampleOut').val($('#node-input-target').val());
+            $('#node-input-exampleOutType').val($('#node-input-targetType').val());
         },
     });
 </script>
 
-<style>
-    .flex-checkbox-row {
-        display: flex;
-        align-items: center;
-        padding-left: 104px;
-        margin-bottom: 12px;
-    }
-
-    .flex-checkbox-row input[type='checkbox'] {
-        width: auto !important;
-        margin: 0 8px 0 0 !important;
-    }
-
-    .flex-checkbox-row label {
-        width: auto !important;
-        margin: 0 !important;
-    }
-
-    fieldset.node-red-fieldset {
-        border: 1px solid var(--red-ui-form-input-border-color, #ccc) !important;
-        padding: 12px !important;
-        margin-bottom: 12px !important;
-        border-radius: 4px !important;
-    }
-
-    fieldset.node-red-fieldset legend {
-        border-bottom: none !important;
-        width: auto !important;
-        padding: 0 5px !important;
-        font-size: 13px !important;
-        font-weight: bold !important;
-        color: var(--red-ui-primary-text-color, #555) !important;
-        margin-bottom: 0 !important;
-    }
-
-    .input-width-70 {
-        width: 70% !important;
-    }
-</style>
+<link rel="stylesheet" href="resources/@faigle/node-red-runtime-utils/editor.css" />
 
 <script type="text/html" data-template-name="_template_">
-    <div class="form-row">
-        <label for="node-input-name">
-            <i class="fa fa-tag"></i>
-            Name
-        </label>
-        <input type="text" id="node-input-name" class="input-width-70" placeholder="Name" />
+    <div class="faigle-node-editor">
+        <div class="form-row">
+            <label for="node-input-name">
+                <i class="fa fa-tag"></i>
+                <span>Name</span>
+            </label>
+            <input type="text" id="node-input-name" placeholder="Name" />
+        </div>
+
+        <fieldset class="node-red-fieldset">
+            <legend>Configuration</legend>
+
+            <div class="form-row flex-checkbox-row">
+                <input type="checkbox" id="node-input-enableLogging" />
+                <label for="node-input-enableLogging">Enable Logging</label>
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-source">
+                    <i class="fa fa-sign-in"></i>
+                    <span>Source</span>
+                </label>
+                <input type="text" id="node-input-source" placeholder="Source property" />
+                <input type="hidden" id="node-input-sourceType" />
+            </div>
+
+            <div class="form-row">
+                <label for="node-input-target">
+                    <i class="fa fa-sign-out"></i>
+                    <span>Target</span>
+                </label>
+                <input type="text" id="node-input-target" placeholder="Target property" />
+                <input type="hidden" id="node-input-targetType" />
+            </div>
+        </fieldset>
+
+        <!-- Hidden inputs for legacy flow compatibility -->
+        <input type="hidden" id="node-input-exampleIn" />
+        <input type="hidden" id="node-input-exampleInType" />
+        <input type="hidden" id="node-input-exampleOut" />
+        <input type="hidden" id="node-input-exampleOutType" />
     </div>
-
-    <fieldset id="file-options-group" class="node-red-fieldset">
-        <legend>File Options</legend>
-
-        <div class="form-row flex-checkbox-row">
-            <input type="checkbox" id="node-input-enableLogging" />
-            <label for="node-input-enableLogging">Enable Logging</label>
-        </div>
-
-        <div class="form-row">
-            <label for="node-input-exampleIn">
-                <i class="fa fa-sign-in"></i>
-                Example In
-            </label>
-            <input
-                type="text"
-                id="node-input-exampleIn"
-                class="input-width-70"
-                placeholder="Input property"
-            />
-            <input type="hidden" id="node-input-exampleInType" />
-        </div>
-
-        <div class="form-row">
-            <label for="node-input-exampleOut">
-                <i class="fa fa-sign-out"></i>
-                Example Out
-            </label>
-            <input
-                type="text"
-                id="node-input-exampleOut"
-                class="input-width-70"
-                placeholder="Output property"
-            />
-            <input type="hidden" id="node-input-exampleOutType" />
-        </div>
-    </fieldset>
 </script>
 
 <!-- @formatter:off -->
 <!-- prettier-ignore -->
 <script type="text/markdown" data-help-name="_template_">
-A custom node that reads a string, increments any trailing number, and writes the result to a specified output.
+A boilerplate template node demonstrating standard Faigle Node-RED practices.
+
+### Description
+
+This node illustrates the canonical architecture for custom nodes:
+1. Reads input from a configurable **Source** property using `@faigle/node-red-runtime-utils`.
+2. Applies sample transformation logic.
+3. Writes output to a configurable **Target** property (`msg`, `flow`, or `global`).
+4. Manages visual node status (`processing`, `succeeded`, `failed`, `waiting`).
 
 ### Properties
 
 - **Name** _string_ \
-  The label of the node in the workspace.
+  The custom label displayed for this node in the workspace.
 
 - **Enable Logging** _boolean_ \
-  If checked, logs the incoming `msg.payload` to the Node-RED debug console.
+  When checked, outputs informative debug logs to the Node-RED console.
 
-- **Example In** _string | msg | flow | global | jsonata | env_ \
-  The source property containing the string to be evaluated (e.g., "name 1").
+- **Source** _msg | flow | global | str | num | bool | json | jsonata | env_ \
+  The property or value evaluated as input for processing. Default is `msg.payload`.
 
-- **Example Out** _msg | flow | global_ \
-  The destination property where the incremented string (e.g., "name 2") will be stored.
+- **Target** _msg | flow | global_ \
+  The destination where the transformed result will be stored. Default is `msg.payload`.
 
-### Details
+### Usage for Developers
 
-This node reads a value from the **Example In** configuration. If the retrieved value is a string ending with a number, it isolates the text, increments the number by 1, and saves the new string to the location defined by **Example Out**. The message is then passed to the output unmodified.
+To create a new custom node using this repository as a template:
+1. Rename all instances of `_template_` to your node name.
+2. Define custom properties in the `defaults` section and editor form.
+3. Use `node.getTypedProperty()` and `node.setTypedProperty()` for input/output handling.
+4. Keep the shared styling from `@faigle/node-red-runtime-utils/editor.css`.
 </script>
 <!-- @formatter:on -->

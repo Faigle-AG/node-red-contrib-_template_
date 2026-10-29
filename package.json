@@ -1,12 +1,17 @@
 {
   "name": "@faigle/node-red-contrib-_template_",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Template/Example node for Node-Red",
   "keywords": [
     "node-red"
   ],
   "private": false,
   "license": "MIT",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "node-red": {
     "nodes": {
       "_template_": "src/_template_.js"
@@ -29,7 +34,7 @@
     "prettier": "^3.9.4"
   },
   "dependencies": {
-    "@faigle/node-red-runtime-utils": "^0.4.3"
+    "@faigle/node-red-runtime-utils": "^0.6.7"
   },
   "workspaces": [
     "../../node-red-runtime/*"
