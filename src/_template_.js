@@ -25,12 +25,19 @@ module.exports = function (RED) {
         node.target = config.target || config.exampleOut || 'payload';
         node.targetType = config.targetType || config.exampleOutType || 'msg';
 
+        // Set on close. Input still in progress then starts no new work and completes without
+        // status, output or error; a write already started is not undone.
+        let closing = false;
+
         node.on('input', async function (msg, send, done) {
             send =
                 send ||
                 function () {
                     node.send.apply(node, arguments);
                 };
+            const finishClosed = () => {
+                if (done) done();
+            };
 
             try {
                 node.status.processing('processing');
@@ -50,6 +57,8 @@ module.exports = function (RED) {
                     msg,
                     'Source property',
                 );
+                // Check after every await: the node may have closed in the meantime.
+                if (closing) return finishClosed();
 
                 // 2. Business logic (Boilerplate example: wrap/format the value)
                 const output =
@@ -59,6 +68,7 @@ module.exports = function (RED) {
 
                 // 3. Write result to configured output target via runtime-utils
                 await node.setTypedProperty(node.target, node.targetType, msg, output);
+                if (closing) return finishClosed();
 
                 node.status.succeeded('done', {
                     next: () => node.status.waiting('waiting for input'),
@@ -67,6 +77,7 @@ module.exports = function (RED) {
                 send(msg);
                 if (done) done();
             } catch (err) {
+                if (closing) return finishClosed();
                 node.status.failed(err.message || 'Processing error');
                 if (done) done(err);
                 else node.error(err, msg);
@@ -74,6 +85,7 @@ module.exports = function (RED) {
         });
 
         node.on('close', function (removed, done) {
+            closing = true;
             node.status.clear();
             if (done) done();
         });
