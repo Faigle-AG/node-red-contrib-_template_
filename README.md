@@ -31,9 +31,28 @@ To create a new functional custom node from this template:
 
 ---
 
+## Typed Fields and Compatibility
+
+The example node advertises these types, in this order. Both fields are active on every input.
+
+| Field    | Offered types                                                           | New-node value / type |
+| -------- | ----------------------------------------------------------------------- | --------------------- |
+| `source` | `msg`, `flow`, `global`, `str`, `num`, `bool`, `json`, `jsonata`, `env` | `payload` / `msg`     |
+| `target` | `msg`, `flow`, `global`                                                 | `payload` / `msg`     |
+
+Runtime fallbacks are unchanged and apply separately to each value and type: the first truthy modern field (`source`, `sourceType`, `target`, `targetType`), then its corresponding legacy field (`exampleIn`, `exampleInType`, `exampleOut`, `exampleOutType`), then `payload` for a value or `msg` for a type. The editor's existing legacy-field copy/synchronization behavior is also unchanged; no new migration is introduced.
+
+The runtime validates these effective type tags before evaluating the source or writing the target. An unsupported source tag reports `INVALID_CONFIGURATION` with `Source type '<type>' is not supported`. An unsupported target retains the uncoded `Unsupported target property type: <type>` error, now before source evaluation. Imported or hand-edited flows using unadvertised types can therefore fail earlier or be rejected where they previously worked. The offered types, defaults and transformation logic have not changed.
+
+For `flow` or `global`, named-store keys use Node-RED's `#:(store)::key` syntax where that store is configured. Store availability and persistence depend on the Node-RED context configuration.
+
+The full template also checks for close after each asynchronous property operation: an in-progress input then starts no later work and completes quietly. A target write already started is not rolled back. Use the runtime source and its close tests when adapting this behavior.
+
+---
+
 ## ⚙️ Standard Runtime Integration
 
-This node uses `@faigle/node-red-runtime-utils` for consistent Node-RED lifecycle management:
+This node uses `@faigle/node-red-runtime-utils` for consistent Node-RED lifecycle management. The following snippet illustrates helper calls only; the full implementation in `src/_template_.js` additionally includes the type checks, legacy fallbacks and shutdown checks described above:
 
 ```javascript
 const { extendNode } = require('@faigle/node-red-runtime-utils')(RED);

@@ -1,5 +1,12 @@
 'use strict';
 
+// The types each typed field offers in the editor (Phase 2.9). A configured type outside these
+// fails clearly before anything is evaluated.
+const TYPES = {
+    source: ['msg', 'flow', 'global', 'str', 'num', 'bool', 'json', 'jsonata', 'env'],
+    target: ['msg', 'flow', 'global'],
+};
+
 module.exports = function (RED) {
     const { extendNode } = require('@faigle/node-red-runtime-utils')(RED);
 
@@ -44,6 +51,15 @@ module.exports = function (RED) {
 
                 if (!node.source) {
                     throw createError('Source property configuration is missing', 'CONFIG_MISSING');
+                }
+                if (!TYPES.source.includes(node.sourceType)) {
+                    throw createError(
+                        `Source type '${node.sourceType}' is not supported`,
+                        'INVALID_CONFIGURATION',
+                    );
+                }
+                if (!TYPES.target.includes(node.targetType)) {
+                    throw createError(`Unsupported target property type: ${node.targetType}`);
                 }
 
                 if (node.enableLogging) {
@@ -93,3 +109,5 @@ module.exports = function (RED) {
 
     RED.nodes.registerType('_template_', ExampleTemplateNode);
 };
+
+module.exports.TYPES = TYPES;
