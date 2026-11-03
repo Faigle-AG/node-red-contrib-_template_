@@ -1,6 +1,6 @@
 {
   "name": "@faigle/node-red-contrib-_template_",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Template/Example node for Node-Red",
   "keywords": [
     "node-red"
@@ -29,7 +29,7 @@
     "prettier": "^3.9.4"
   },
   "dependencies": {
-    "@faigle/node-red-runtime-utils": "^0.4.3"
+    "@faigle/node-red-runtime-utils": "^0.6.9"
   },
   "workspaces": [
     "../../node-red-runtime/*"
